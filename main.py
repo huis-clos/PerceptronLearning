@@ -1,7 +1,11 @@
+import copy
 import pandas as pd
 import perceptron
 import numpy as np
-
+import os.path
+import math as m
+from os import listdir
+from os.path import isfile, join
 
 def add_name2(an_array, a):
     j = 0
@@ -11,191 +15,280 @@ def add_name2(an_array, a):
         j += 1
 
 
-error = 0
-correct = 0
-total = 0
+def shuffle_and_write(filename, df):
+
+    for i in range(100):
+        df = df.reindex(np.random.permutation(df.index))
+
+    df.to_csv(filename, header=None)
+
+e_count = 0
+epoch = 4
+total = correct = error = 0
 recal = False
-alpha = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-         'U', 'V', 'W', 'X', 'Y', 'Z']
-
-df = pd.read_csv('letter-recognition.data', index_col=0, header=None, names=
-['x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7', 'x8', 'x9', 'x10', 'x11', 'x12', 'x13', 'x14', 'x15', 'x16'])
-
-df.index.name = 'letter'
-
-df = df.div(15)
-
-train, test = np.split(df, 2)
-
-
-
-length, width = train.shape
+alpha = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+             'U', 'V', 'W', 'X', 'Y', 'Z']
+minus_Z = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+             'U', 'V', 'W', 'X', 'Y']
+alpha_c = copy.deepcopy(alpha)
+alpha_c.pop(0)
+prev_accuracy = 0
+current_accuracy = 0
+letters = []
 
 A = [perceptron.PerceptronA(0.2) for i in range(25)]
 
-add_name2(A, alpha)
+add_name2(A, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(A)
 
 B = [perceptron.PerceptronB(0.2) for i in range(24)]
 
-add_name2(B, alpha)
+add_name2(B, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(B)
 
 C = [perceptron.PerceptronC(0.2) for i in range(23)]
 
-add_name2(C, alpha)
+add_name2(C, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(C)
 
 D = [perceptron.PerceptronD(0.2) for i in range(22)]
 
-add_name2(D, alpha)
+add_name2(D, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(D)
 
 E = [perceptron.PerceptronE(0.2) for i in range(21)]
 
-add_name2(E, alpha)
+add_name2(E, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(E)
 
 F = [perceptron.PerceptronF(0.2) for i in range(20)]
 
-add_name2(F, alpha)
+add_name2(F, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(F)
 
 G = [perceptron.PerceptronG(0.2) for i in range(19)]
 
-add_name2(G, alpha)
+add_name2(G, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(G)
 
 H = [perceptron.PerceptronH(0.2) for i in range(18)]
 
-add_name2(H, alpha)
+add_name2(H, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(H)
 
 I = [perceptron.PerceptronI(0.2) for i in range(17)]
 
-add_name2(I, alpha)
+add_name2(I, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(I)
 
 J = [perceptron.PerceptronJ(0.2) for i in range(16)]
 
-add_name2(J, alpha)
+add_name2(J, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(J)
 
 K = [perceptron.PerceptronK(0.2) for i in range(15)]
 
-add_name2(K, alpha)
+add_name2(K, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(K)
 
 L = [perceptron.PerceptronL(0.2) for i in range(14)]
 
-add_name2(L, alpha)
+add_name2(L, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(L)
 
 M = [perceptron.PerceptronM(0.2) for i in range(13)]
 
-add_name2(M, alpha)
+add_name2(M, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(M)
 
 N = [perceptron.PerceptronN(0.2) for i in range(12)]
 
-add_name2(N, alpha)
+add_name2(N, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(N)
 
 O = [perceptron.PerceptronO(0.2) for i in range(11)]
 
-add_name2(O, alpha)
+add_name2(O, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(O)
 
 P = [perceptron.PerceptronP(0.2) for i in range(10)]
 
-add_name2(P, alpha)
+add_name2(P, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(P)
 
 Q = [perceptron.PerceptronQ(0.2) for i in range(9)]
 
-add_name2(Q, alpha)
+add_name2(Q, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(Q)
 
 R = [perceptron.PerceptronR(0.2) for i in range(8)]
 
-add_name2(R, alpha)
+add_name2(R, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(R)
 
 S = [perceptron.PerceptronS(0.2) for i in range(7)]
 
-add_name2(S, alpha)
+add_name2(S, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(S)
 
 T = [perceptron.PerceptronT(0.2) for i in range(6)]
 
-add_name2(T, alpha)
+add_name2(T, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(T)
 
 U = [perceptron.PerceptronU(0.2) for i in range(5)]
 
-add_name2(U, alpha)
+add_name2(U, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(U)
 
 V = [perceptron.PerceptronV(0.2) for i in range(4)]
 
-add_name2(V, alpha)
+add_name2(V, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(V)
 
 W = [perceptron.PerceptronW(0.2) for i in range(3)]
 
-add_name2(W, alpha)
+add_name2(W, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(W)
 
 X = [perceptron.PerceptronX(0.2) for i in range(2)]
 
-add_name2(X, alpha)
+add_name2(X, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
+
+letters.append(X)
 
 Y = [perceptron.PerceptronY(0.2) for i in range(1)]
 
-add_name2(Y, alpha)
+add_name2(Y, alpha_c)
 
-alpha.pop(0)
+alpha_c.pop(0)
 
+letters.append(Y)
 
-for i, row in enumerate(train.values):
-    row = np.insert(row, 0, 1)
-    for x in A:
-         x.set_test_data(row, train.index[i])
-         if recal:
-             x.reweight()
-             recal = False
-         result = x.test()
-         ++total
-         if result == x.target:
-             ++correct
-         else:
-            ++error
-            x.reweight()
-            recal = True
+for letter in letters:
+    for a in minus_Z:
+        if a ==letter[0].name:
+            root = './shuffled/' + a + '/'
+            files = [f for f in listdir(root)]
 
-    break
+            for file in files:
+
+                name, ext = os.path.splitext(file)
+                aFile = root + file
+
+                while current_accuracy >= prev_accuracy and e_count < 100:
+                    df = pd.read_csv(aFile, index_col=0, header=None)
+
+                    af = df.copy()
+
+                    af = af.set_index(af[1])
+
+                    af = af.drop(1, axis=1)
+
+                    for x in letter:
+                        x_name = x.name + x.name2
+                        if x_name in name:
+                            for i, row in enumerate(af.values):
+                                row = np.insert(row, 0, 1)
+                                x.set_test_data(row, af.index[i])
+                                if recal:
+                                    x.reweight()
+                                    recal = False
+                                result = x.test()
+                                total += 1
+                                if result == x.target:
+                                    correct += 1
+                                else:
+                                    error += 1
+                                    x.reweight()
+                                    recal = True
+                        if total is not 0:
+                            e_count += 1
+                            shuffle_and_write(file, df)
+                            prev_accuracy = current_accuracy
+                            current_accuracy = m.ceil(float(correct) / total * 100)
+
+                            print 'For ' + name + ' on perceptron' + x_name
+                            print '\tEpoch ', e_count
+                            print '\t\tCorrect: ', current_accuracy
+                            print '\t\tTotal samples: ', total
+                            print '\t\tError: ', m.ceil(float(error) / total * 100), '\n'
+
+                            if prev_accuracy > current_accuracy:
+                                x.rollback()
+
+                            total = error = correct = 0
+                            recal = False
+
+                current_accuracy = prev_accuracy = e_count = 0

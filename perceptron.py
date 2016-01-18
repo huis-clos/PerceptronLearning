@@ -48,12 +48,10 @@ class Perceptron(object):
 
     def reweight(self):
 
-        j = 0
         self.prev_w = np.copy(self.w)
 
         for idx, i in enumerate(self.w):
-            self.w[idx] = i + self.eta * self.target * self.x[j]
-            ++j
+            self.w[idx] = i + self.eta * self.target * self.x[idx]
 
 
 class PerceptronA(Perceptron):
