@@ -1,3 +1,14 @@
+# Colleen Toth
+# CS545, Machine Learning
+# Prof. Melanie Mitchell
+# Homework 1
+# Due: 19 January 2016
+#
+# Main perceptron testing program. Initializes perceptrons, runs
+# training and then runs the test on final weights. Finally, generates
+# confusion matrix based on the testing classifications. Training
+# runs
+
 import copy
 import pandas as pd
 import perceptron
@@ -5,7 +16,7 @@ import numpy as np
 import os.path
 import math as m
 from os import listdir
-from os.path import isfile, join
+import operator
 
 def add_name2(an_array, a):
     j = 0
@@ -23,7 +34,6 @@ def shuffle_and_write(filename, df):
     df.to_csv(filename, header=None)
 
 e_count = 0
-epoch = 4
 total = correct = error = 0
 recal = False
 alpha = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
@@ -35,7 +45,15 @@ alpha_c.pop(0)
 prev_accuracy = 0
 current_accuracy = 0
 letters = []
+y_true = []
+y = []
+votes = dict.fromkeys(alpha, 0)
+test_votes = dict.fromkeys(alpha, 0)
+c = 0
 
+# initialize perceptrons with eta of 0.2 for groups of A's, B's, C's
+# etc. Sets initial weights as well. See perceptron.py for class
+# definition and associated functions
 A = [perceptron.PerceptronA(0.2) for i in range(25)]
 
 add_name2(A, alpha_c)
@@ -238,7 +256,7 @@ letters.append(Y)
 
 for letter in letters:
     for a in minus_Z:
-        if a ==letter[0].name:
+        if a == letter[0].name:
             root = './shuffled/' + a + '/'
             files = [f for f in listdir(root)]
 
@@ -275,15 +293,9 @@ for letter in letters:
                                     recal = True
                         if total is not 0:
                             e_count += 1
-                            shuffle_and_write(file, df)
+                            shuffle_and_write(aFile, df)
                             prev_accuracy = current_accuracy
                             current_accuracy = m.ceil(float(correct) / total * 100)
-
-                            print 'For ' + name + ' on perceptron' + x_name
-                            print '\tEpoch ', e_count
-                            print '\t\tCorrect: ', current_accuracy
-                            print '\t\tTotal samples: ', total
-                            print '\t\tError: ', m.ceil(float(error) / total * 100), '\n'
 
                             if prev_accuracy > current_accuracy:
                                 x.rollback()
@@ -292,3 +304,46 @@ for letter in letters:
                             recal = False
 
                 current_accuracy = prev_accuracy = e_count = 0
+
+tfile = './shuffled/test_data_shuffled.csv'
+tf = pd.read_csv(tfile, index_col=0, header=None)
+
+tcf = tf.copy()
+
+tcf = tcf.set_index(tcf[1])
+
+tcf = tcf.drop(1, axis=1)
+
+y_true = tcf.index.values
+
+name, ext = os.path.splitext(tfile)
+for i, row in enumerate(tcf.values):
+    row = np.insert(row, 0, 1)
+    for letter in letters:
+        for z in letter:
+            z_name = z.name + z.name2
+            z.set_test_data(row, tcf.index[i])
+            result = z.test()
+            if result == 1:
+                votes[z.name] += 1
+            else:
+                votes[z.name2] += 1
+
+        vote = max(votes.iteritems(), key=operator.itemgetter(1))[0]
+        test_votes[vote] += 1
+        votes = dict.fromkeys(alpha, 0)
+    count = max(test_votes.iteritems(), key=operator.itemgetter(1))[0]
+    y.append(count)
+    c += 1
+    print c
+
+print 'Confusion Matrix:\n\n'
+
+print y
+
+y_actul = pd.Series(y_true, name='Actual')
+y_pred = pd.Series(y, name='Predicted')
+
+confusion = pd.crosstab(y_actul, y_pred, rownames=['Actual'], colnames=['Predicted'], margins=True)
+
+print confusion
