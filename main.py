@@ -34,7 +34,7 @@ def shuffle_and_write(filename, df):
     df.to_csv(filename, header=None)
 
 e_count = 0
-total = correct = error = 0
+total = correct = error = t_correct = 0
 recal = False
 alpha = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
              'U', 'V', 'W', 'X', 'Y', 'Z']
@@ -297,6 +297,12 @@ for letter in letters:
                             prev_accuracy = current_accuracy
                             current_accuracy = m.ceil(float(correct) / total * 100)
 
+                            # print 'For ' + name + ' on perceptron' + x_name
+                            # print '\tEpoch ', e_count
+                            # print '\t\tCorrect: ', current_accuracy
+                            # print '\t\tTotal samples: ', total
+                            # print '\t\tError: ', m.ceil(float(error) / total * 100), '\n'
+
                             if prev_accuracy > current_accuracy:
                                 x.rollback()
 
@@ -329,15 +335,18 @@ for i, row in enumerate(tcf.values):
             else:
                 votes[z.name2] += 1
 
-        vote = max(votes.iteritems(), key=operator.itemgetter(1))[0]
-        test_votes[vote] += 1
-        votes = dict.fromkeys(alpha, 0)
-    count = max(test_votes.iteritems(), key=operator.itemgetter(1))[0]
+    count = max(votes.iteritems(), key=operator.itemgetter(1))[0]
+    votes = dict.fromkeys(alpha, 0)
     y.append(count)
+    if count == tcf.index[i]:
+        t_correct += 1
     c += 1
     print c
 
-print 'Confusion Matrix:\n\n'
+print '\n\nConfusion Matrix:\n\n'
+
+print '\tAccuracy is: ', m.ceil(float(t_correct) / 10000 * 100), '\n\n'
+
 
 print y
 
